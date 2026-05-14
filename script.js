@@ -1,10 +1,25 @@
-document.addEventListener("DOMContentLoaded", function () {
 
+// Wait until webpage fully loads
+document.addEventListener("DOMContentLoaded", async function () {
+    meals = await loadTasks()
     displayMeals(meals);
 
+    // Load healthy quote when page loads
+    loadHealthyQuote();
+
+    // New Quote Button
+    const newQuoteBtn = document.querySelector("#newQuoteBtn");
+
+    newQuoteBtn.addEventListener("click", function () {
+
+        loadHealthyQuote();
+
+    });
+
+    // Add Meal Button
     const addMealButton = document.querySelector("#addMealBtn");
 
-    addMealButton.addEventListener("click", function () {
+    addMealButton.addEventListener("click", async function () {
 
         const mealName = document.querySelector("#mealName").value;
         const mealDate = document.querySelector("#mealDate").value;
@@ -12,6 +27,27 @@ document.addEventListener("DOMContentLoaded", function () {
         const calories = document.querySelector("#calories").value;
 
         addMeal(meals, mealName, mealDate, mealType, calories);
+
+        // ASYNC AJAX POST REQUEST
+        try {
+
+            await axios.post(
+                "https://jsonplaceholder.typicode.com/posts",
+                {
+                    mealName: mealName,
+                    mealDate: mealDate,
+                    mealType: mealType,
+                    calories: calories
+                }
+            );
+
+            console.log("Meal sent successfully!");
+
+        } catch (error) {
+
+            console.log("POST request failed");
+
+        }
 
         displayMeals(meals);
 
@@ -23,6 +59,42 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+// FETCH JSON DATA USING AJAX + ASYNC
+async function loadHealthyQuote() {
+
+    const quoteText = document.querySelector("#quoteText");
+
+    quoteText.innerHTML = "Loading quote...";
+
+    try {
+
+        // GET REQUEST
+        const response = await axios.get(
+            "https://jsonplaceholder.typicode.com/posts"
+        );
+
+        // JSON data fetched
+        const quotes = response.data;
+
+        // Random quote
+        const randomNumber =
+            Math.floor(Math.random() * quotes.length);
+
+        const randomQuote = quotes[randomNumber];
+
+        quoteText.innerHTML =
+            `"${randomQuote.title}"`;
+
+    } catch (error) {
+
+        quoteText.innerHTML =
+            "Could not load healthy quote.";
+
+        console.log(error);
+
+    }
+}
 
 function displayMeals(meals) {
 
@@ -45,19 +117,30 @@ function displayMeals(meals) {
         // Bootstrap colors based on meal type
         if (m.mealType == "Breakfast") {
 
-            liElement.classList.add("bg-primary", "text-white");
+            liElement.classList.add(
+                "bg-primary",
+                "text-white"
+            );
 
         } else if (m.mealType == "Lunch") {
 
-            liElement.classList.add("bg-danger", "text-white");
+            liElement.classList.add(
+                "bg-danger",
+                "text-white"
+            );
 
         } else if (m.mealType == "Dinner") {
 
-            liElement.classList.add("bg-warning");
+            liElement.classList.add(
+                "bg-warning"
+            );
 
         } else {
 
-            liElement.classList.add("bg-info", "text-white");
+            liElement.classList.add(
+                "bg-info",
+                "text-white"
+            );
         }
 
         liElement.innerHTML = `
@@ -96,7 +179,8 @@ function displayMeals(meals) {
         `;
 
         // DELETE BUTTON
-        const deleteBtn = liElement.querySelector(".delete-btn");
+        const deleteBtn =
+            liElement.querySelector(".delete-btn");
 
         deleteBtn.addEventListener("click", function () {
 
@@ -107,7 +191,8 @@ function displayMeals(meals) {
         });
 
         // UPDATE BUTTON
-        const updateBtn = liElement.querySelector(".update-btn");
+        const updateBtn =
+            liElement.querySelector(".update-btn");
 
         updateBtn.addEventListener("click", function () {
 
@@ -138,25 +223,30 @@ function displayMeals(meals) {
                 <div class="mb-3">
                     <label>Meal Type</label>
 
-                    <select id="newMealType" class="form-control">
+                    <select id="newMealType"
+                        class="form-control">
 
                         <option value="Breakfast"
-                        ${m.mealType == "Breakfast" ? "selected" : ""}>
+                        ${m.mealType == "Breakfast"
+                        ? "selected" : ""}>
                         Breakfast
                         </option>
 
                         <option value="Lunch"
-                        ${m.mealType == "Lunch" ? "selected" : ""}>
+                        ${m.mealType == "Lunch"
+                        ? "selected" : ""}>
                         Lunch
                         </option>
 
                         <option value="Dinner"
-                        ${m.mealType == "Dinner" ? "selected" : ""}>
+                        ${m.mealType == "Dinner"
+                        ? "selected" : ""}>
                         Dinner
                         </option>
 
                         <option value="Snack"
-                        ${m.mealType == "Snack" ? "selected" : ""}>
+                        ${m.mealType == "Snack"
+                        ? "selected" : ""}>
                         Snack
                         </option>
 
@@ -179,16 +269,24 @@ function displayMeals(meals) {
                 preConfirm: function () {
 
                     const newMealName =
-                        document.querySelector("#newMealName").value;
+                        document.querySelector(
+                            "#newMealName"
+                        ).value;
 
                     const newMealDate =
-                        document.querySelector("#newMealDate").value;
+                        document.querySelector(
+                            "#newMealDate"
+                        ).value;
 
                     const newMealType =
-                        document.querySelector("#newMealType").value;
+                        document.querySelector(
+                            "#newMealType"
+                        ).value;
 
                     const newCalories =
-                        document.querySelector("#newCalories").value;
+                        document.querySelector(
+                            "#newCalories"
+                        ).value;
 
                     updateMeal(
                         meals,
